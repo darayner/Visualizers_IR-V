@@ -5,7 +5,7 @@ import json
 ps = PorterStemmer()
 inverted_index = {}
 DocCount=0
-with open('dataTest.json') as json_file:
+with open('data.json') as json_file:
     data = json.load(json_file)
     for entry in data:
         DocCount+=1
@@ -24,12 +24,14 @@ with open('dataTest.json') as json_file:
 idfDic = {}
 for term in inverted_index:
     tfSum = 0
-    for value,doc in inverted_index[term]:
+    for doc,value in inverted_index[term].items():
         tfSum += value
     idf = DocCount/tfSum
     idfDic[term]= idf
 
-
+for term in inverted_index:
+    for doc,value in inverted_index[term].items():
+        inverted_index[term][doc]=value*idfDic[term]
 
 with open('invertedIndex.json', 'w', encoding='utf-8') as f:
     json.dump(inverted_index, f, ensure_ascii=False, indent=4)
