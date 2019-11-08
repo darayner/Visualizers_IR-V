@@ -21,4 +21,15 @@ with open('dataTest.json') as json_file:
                 inverted_index[term][docName] = 1
             elif docName in inverted_index[term]:
                 inverted_index[term][docName] += 1
-print(inverted_index)
+idfDic = {}
+for term in inverted_index:
+    tfSum = 0
+    for value,doc in inverted_index[term]:
+        tfSum += value
+    idf = DocCount/tfSum
+    idfDic[term]= idf
+
+
+
+with open('invertedIndex.json', 'w', encoding='utf-8') as f:
+    json.dump(inverted_index, f, ensure_ascii=False, indent=4)
