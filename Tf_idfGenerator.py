@@ -20,22 +20,3 @@ def main():
                     inverted_index[ps.stem(term)] = inverted_index[ps.stem(term)] + ", d" + str(docName)
             print(docName)
             print(text)
-
-
-
-
-
-
-
-
-
-
-
-
-if __name__ == "__main__":
-    main()
-
-
-
-
-print(inverted_index)
