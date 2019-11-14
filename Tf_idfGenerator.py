@@ -5,11 +5,13 @@ import math
 
 
 def main():
-    queries_to_test = {}
+    query_to_test = {'Query': "Adobe Windows security team"}
     inverted, doc_count = create_inverted_index()
+    inverted = add_query_to_inverted(inverted, query_to_test)
     tf_idf = create_tf_idf_matrix(inverted, doc_count)
     normalized = create_normalized_matrix(tf_idf)
-    matrices_to_output = {'invertedIndex': inverted, 'tfIdfMatrix': tf_idf, 'normalizedMatrix': normalized}
+    cos_sim = cos_sim_matrix(normalized, 'Query')
+    matrices_to_output = {'normalizedMatrix': normalized, 'cosSim': cos_sim}
     output_json(matrices_to_output)
 
 
@@ -34,6 +36,19 @@ def create_inverted_index():
                 elif doc_name in inverted_index[term]:
                     inverted_index[term][doc_name] += 1
     return inverted_index, doc_count
+
+
+def add_query_to_inverted(inverted_index, query_to_test):
+    ps = PorterStemmer()
+    for query_id, query in query_to_test.items():
+        terms = word_tokenize(query)
+        for term in terms:
+            term = ps.stem(term)
+            if term in inverted_index:
+                inverted_index[term][query_id] = 1
+            elif query_id in inverted_index[term]:
+                inverted_index[term][query_id] += 1
+    return inverted_index
 
 
 def create_tf_idf_matrix(inverted_index, doc_count):
@@ -69,8 +84,26 @@ def create_normalized_matrix(tf_idf_matrix):
     return normalized_doc_matrix
 
 
-def cos_sim_matrix():
-    pass
+def cos_sim_matrix(normalized_matrix, query_id):
+    cos_sim = {}
+    sorted_cos_sim = {}
+    query_summation = 0
+    query_vector = normalized_matrix[query_id]
+    for term, value in query_vector.items():
+        query_summation += math.pow(value, 2)
+    query_l2_norm = math.sqrt(query_summation)
+    for doc in normalized_matrix:
+        doc_summation = 0
+        dot_product = 0
+        for term, value in normalized_matrix[doc].items():
+            if term in query_vector:
+                dot_product += (value * query_vector[term])
+            doc_summation += math.pow(value, 2)
+        doc_l2_norm = math.sqrt(doc_summation)
+        cos_sim[doc] = round(dot_product/(query_l2_norm * doc_l2_norm), 2)
+    for doc, sim in sorted(cos_sim.items(), key=lambda item: item[1], reverse=True):
+       sorted_cos_sim[doc] = sim
+    return sorted_cos_sim
 
 
 def output_json(matrices_to_output):
