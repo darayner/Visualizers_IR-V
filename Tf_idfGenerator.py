@@ -5,7 +5,7 @@ import math
 
 
 def main():
-    query_to_test = {'Query': "Adobe Windows security team"}
+    query_to_test = "SQL attack injection attack attack"
     inverted, doc_count = create_inverted_index()
     inverted = add_query_to_inverted(inverted, query_to_test)
     tf_idf = create_tf_idf_matrix(inverted, doc_count)
@@ -40,14 +40,13 @@ def create_inverted_index():
 
 def add_query_to_inverted(inverted_index, query_to_test):
     ps = PorterStemmer()
-    for query_id, query in query_to_test.items():
-        terms = word_tokenize(query)
-        for term in terms:
-            term = ps.stem(term)
-            if term in inverted_index:
-                inverted_index[term][query_id] = 1
-            elif query_id in inverted_index[term]:
-                inverted_index[term][query_id] += 1
+    terms = word_tokenize(query_to_test)
+    for term in terms:
+        term = ps.stem(term)
+        if 'Query' in inverted_index[term]:
+            inverted_index[term]['Query'] += 1
+        elif term in inverted_index:
+            inverted_index[term]['Query'] = 1
     return inverted_index
 
 
