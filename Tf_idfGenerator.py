@@ -5,13 +5,13 @@ import math
 
 
 def main():
-    query_to_test = "SQL attack injection attack attack"
+    query_to_test = "SQL attach injection attach attach"
     inverted, doc_count = create_inverted_index()
     inverted = add_query_to_inverted(inverted, query_to_test)
     tf_idf = create_tf_idf_matrix(inverted, doc_count)
     normalized = create_normalized_matrix(tf_idf)
     cos_sim = cos_sim_matrix(normalized, 'Query')
-    matrices_to_output = {'normalizedMatrix': normalized, 'cosSim': cos_sim}
+    matrices_to_output = {'normalizedMatrix': normalized, 'cosSim': cos_sim, 'inverted': inverted}
     output_json(matrices_to_output)
 
 
@@ -43,10 +43,11 @@ def add_query_to_inverted(inverted_index, query_to_test):
     terms = word_tokenize(query_to_test)
     for term in terms:
         term = ps.stem(term)
-        if 'Query' in inverted_index[term]:
-            inverted_index[term]['Query'] += 1
-        elif term in inverted_index:
-            inverted_index[term]['Query'] = 1
+        if term in inverted_index:
+            if 'Query' in inverted_index[term]:
+                inverted_index[term]['Query'] += 1
+            else:
+                inverted_index[term]['Query'] = 1
     return inverted_index
 
 
@@ -55,7 +56,7 @@ def create_tf_idf_matrix(inverted_index, doc_count):
     for term in inverted_index:
         tfSum = 0
         for doc, value in inverted_index[term].items():
-            tfSum += value
+            tfSum += 1
         idf = doc_count/tfSum
         idfDic[term] = idf
     for term in inverted_index:
