@@ -11,7 +11,7 @@ def main():
     tf_idf = create_tf_idf_matrix(inverted, doc_count)
     normalized = create_normalized_matrix(tf_idf)
     cos_sim = cos_sim_matrix(normalized, 'Query')
-    matrices_to_output = {'normalizedMatrix': normalized, 'cosSim': cos_sim, 'inverted': inverted}
+    matrices_to_output = {'normalizedMatrix': normalized, 'cosSim': cos_sim}
     output_json(matrices_to_output)
 
 
