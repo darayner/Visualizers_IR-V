@@ -2,24 +2,30 @@ from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
 import json
 import math
-
+import time
 
 def main():
-    query_to_test = "SQL attach injection attach attach"
-    inverted, doc_count = create_inverted_index()
-    inverted = add_query_to_inverted(inverted, query_to_test)
-    tf_idf = create_tf_idf_matrix(inverted, doc_count)
-    normalized = create_normalized_matrix(tf_idf)
-    cos_sim = cos_sim_matrix(normalized, 'Query')
-    matrices_to_output = {'normalizedMatrix': normalized, 'cosSim': cos_sim}
-    output_json(matrices_to_output)
+    query_to_test = ["Adobe Windows Security team", "Persistent Cross-Site Scripting", "SQL injection attack",
+                     "Buffer Overflow", "Google Security Research NULL Pointer Dereference "]
+    for query in query_to_test:
+        print(f'Query: {query}')
+        inverted, doc_count = create_inverted_index()
+        inverted = add_query_to_inverted(inverted, query)
+        tf_idf = create_tf_idf_matrix(inverted, doc_count)
+        normalized = create_normalized_matrix(tf_idf)
+        start = time.time()
+        cos_sim = cos_sim_matrix(normalized, 'Query')
+        end = time.time()
+        print(f'Time elapsed: {round(end - start, 5)}')
+        matrices_to_output = {f'cosSim_Query:{query}': cos_sim}
+        output_json(matrices_to_output)
 
 
 def create_inverted_index():
     ps = PorterStemmer()
     inverted_index = {}
     doc_count = 0
-    with open('data.json') as json_file:
+    with open('data (2).json') as json_file:
         data = json.load(json_file)
         for entry in data:
             doc_count += 1
